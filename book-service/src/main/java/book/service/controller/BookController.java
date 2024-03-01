@@ -24,17 +24,6 @@ public class BookController {
     this.bookRepository = bookRepository;
   }
 
-  @GetMapping("/test/{id}")
-  public String test(@PathVariable int id) {
-    bookRepository.createBook("Mark Twen", "Tom Soyer", Set.of("child"));
-    List<Book> allBooks = bookRepository.findAll();
-    for (Book book: allBooks) {
-      if (book.getId() == id)
-        return book.toString();
-    }
-    return "No book with such id";
-  }
-
   @PostMapping("/book")
   public Book createBook(@Valid @RequestBody Request.RequestToCreateBook request) {
     return bookRepository.createBook(request.getAuthor(), request.getTitle(), request.getTags());

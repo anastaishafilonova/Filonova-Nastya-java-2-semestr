@@ -1,5 +1,7 @@
 package book.service.controller.request;
 
+import book.service.entity.Author;
+import jakarta.persistence.UniqueConstraint;
 import jakarta.validation.constraints.NotNull;
 
 import java.util.Set;
@@ -7,22 +9,10 @@ import java.util.Set;
 public class Request {
   public static class RequestToUpdateBook {
     @NotNull(message = "Author can`t be null")
-    private String author;
-
-    @NotNull(message = "Author can`t be null")
     private String title;
 
-    public RequestToUpdateBook(String author, String title) {
-      this.author = author;
+    public RequestToUpdateBook(String title) {
       this.title = title;
-    }
-
-    public String getAuthor() {
-      return author;
-    }
-
-    public void setAuthor(String author) {
-      this.author = author;
     }
 
     public String getTitle() {
@@ -35,43 +25,77 @@ public class Request {
   }
 
   public static class RequestToCreateBook {
-    @NotNull(message = "Author can`t be null")
-    private String author;
+    @NotNull(message = "Author`s firstName can`t be null")
+    private String firstName;
+
+    @NotNull(message = "Author`s lastName can`t be null")
+    private String lastName;
 
     @NotNull(message = "Title can`t be null")
     private String title;
 
-    @NotNull(message = "Tags can`t be null")
-    private Set<String> tags;
-
-    public RequestToCreateBook(String author, String title, Set<String> tags) {
-      this.author = author;
+    public RequestToCreateBook(String firstName, String lastName, String title) {
+      this.firstName = firstName;
+      this.lastName = lastName;
       this.title = title;
-      this.tags = tags;
     }
 
-    public String getAuthor() {
-      return author;
+    public String getFirstName() {
+      return firstName;
     }
 
-    public void setAuthor(String author) {
-      this.author = author;
+    public String getLastName() {
+      return lastName;
     }
 
     public String getTitle() {
       return title;
     }
+  }
 
-    public void setTitle(String title) {
-      this.title = title;
+  public static class RequestToCreateOrUpdateAuthor {
+    private String firstName;
+    private String lastName;
+
+    public RequestToCreateOrUpdateAuthor(String firstName, String lastName) {
+      this.firstName = firstName;
+      this.lastName = lastName;
     }
 
-    public Set<String> getTags() {
-      return tags;
+    public String getFirstName() {
+      return firstName;
     }
 
-    public void setTags(Set<String> tags) {
-      this.tags = tags;
+    public void setFirstName(String firstName) {
+      this.firstName = firstName;
+    }
+
+    public String getLastName() {
+      return lastName;
+    }
+
+    public void setLastName(String lastName) {
+      this.lastName = lastName;
     }
   }
+
+  public static class RequestToCreateTag {
+    private String text;
+    private Long bookId;
+
+    public RequestToCreateTag(String text, Long bookId) {
+      this.text = text;
+      this.bookId = bookId;
+    }
+
+    public String getText() {
+      return text;
+    }
+
+    public Long getBookId() {
+      return bookId;
+    }
+  }
+
+  public record RequestToUpdateTag(String name) {}
 }

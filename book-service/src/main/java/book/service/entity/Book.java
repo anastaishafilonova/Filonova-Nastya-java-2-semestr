@@ -1,27 +1,43 @@
 package book.service.entity;
 
+import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
+import org.hibernate.annotations.JoinColumnOrFormula;
+
+import java.util.HashSet;
+import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
+@Entity
+@Table(name = "books")
 public class Book {
-  private int id = -1;
-  private String author;
-  private String title;
-  private Set<String> tags;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
 
-  public Book() {
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "author_id")
+  private Author author;
+//  @NotNull(message = "Title can not be null")
+  private String title;
+
+  @ManyToMany(mappedBy = "books")
+  private Set<Tag> tags = new HashSet<>();
+
+  protected Book() {
   }
 
-  public Book(String author, String title, Set<String> tags) {
+  public Book(Author author, String title) {
     this.author = author;
     this.title = title;
-    this.tags = tags;
   }
 
-  public String getAuthor() {
+  public Author getAuthor() {
     return author;
   }
 
-  public void setAuthor(String author) {
+  public void setAuthor(Author author) {
     this.author = author;
   }
 
@@ -33,24 +49,26 @@ public class Book {
     this.title = title;
   }
 
-  public Set<String> getTags() {
-    return tags;
-  }
-
-  public void setTags(Set<String> tags) {
-    this.tags = tags;
-  }
-
-  public int getId() {
+  public long getId() {
     return id;
   }
 
-  public void setId(int id) {
-    this.id = id;
-  }
 
   @Override
   public String toString() {
     return "author: " + this.author + "\n" + "title: " + this.title;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (!(o instanceof Book)) return false;
+    Book book = (Book) o;
+    return id != null && id.equals(book.id);
+  }
+
+  @Override
+  public int hashCode() {
+    return Book.class.hashCode();
   }
 }

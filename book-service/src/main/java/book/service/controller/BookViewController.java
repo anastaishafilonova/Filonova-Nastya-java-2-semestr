@@ -20,7 +20,7 @@ public class BookViewController {
 
   @GetMapping("/books")
   public String viewBooks(Model model) {
-    List<Book> books = bookRepository.findAll();
+    List<Book> books = bookRepository.findAllBy();
     model.addAttribute("books", books);
     return "books";
   }

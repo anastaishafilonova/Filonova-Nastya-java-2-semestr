@@ -1,15 +1,16 @@
 package book.service.repository;
 
 import book.service.entity.Book;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Set;
 
-public interface BookRepository {
-  Book createBook(String author, String title, Set<String> tags);
-  Book updateBook(int id, String author, String title);
-  void deleteBookById(int id);
-  Book getBookWithTag(String tag);
-  List<Book> findAll();
-  void deleteAll();
+@Repository
+public interface BookRepository extends JpaRepository<Book, Long> {
+  List<Book> findAllBy();
+
+  Book findByTitle(String title);
 }

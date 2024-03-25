@@ -7,10 +7,12 @@ import org.springframework.lang.NonNull;
 import org.springframework.test.context.ContextConfiguration;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.lifecycle.Startables;
+import org.testcontainers.utility.DockerImageName;
 
 @ContextConfiguration(initializers = DatabaseSuite.Initializer.class)
 public class DatabaseSuite {
-  private static final PostgreSQLContainer<?> POSTGRES = new PostgreSQLContainer<>("postgres");
+  final static DockerImageName POSTGRES_IMAGE = DockerImageName.parse("postgres:13");
+  private static final PostgreSQLContainer<?> POSTGRES = new PostgreSQLContainer<>(POSTGRES_IMAGE);
 
   static class Initializer
       implements ApplicationContextInitializer<ConfigurableApplicationContext> {

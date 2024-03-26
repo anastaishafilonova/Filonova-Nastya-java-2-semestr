@@ -14,7 +14,6 @@ import org.springframework.transaction.annotation.Transactional;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @DataJpaTest
-@ActiveProfiles("test")
 @Transactional(propagation = Propagation.NOT_SUPPORTED)
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @Import({BookService.class, AuthorService.class})
@@ -26,7 +25,7 @@ public class BookServiceTest extends DatabaseSuite {
   private AuthorService authorService;
 
   @Test
-  public void createBookTest() {
+  public void  createBookTest() {
     Author author = authorService.createAuthor("Джек", "Лондон");
     BookResponse book = bookService.createBook("Джек", "Лондон", "Мартин Иден");
     assertEquals(book.authorId(), author.getId());

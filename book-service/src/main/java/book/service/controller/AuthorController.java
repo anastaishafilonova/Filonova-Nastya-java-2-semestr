@@ -1,6 +1,7 @@
 package book.service.controller;
 
 import book.service.controller.request.Request;
+import book.service.controller.response.AuthorResponse;
 import book.service.entity.Author;
 import book.service.service.AuthorService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,8 +26,8 @@ public class AuthorController {
   }
 
   @PutMapping("/{id}")
-  public void updateAuthor(@PathVariable Long id, @RequestBody Request.RequestToCreateOrUpdateAuthor request) {
-    authorService.updateAuthor(id, request.getFirstName(), request.getLastName());
+  public AuthorResponse updateAuthor(@PathVariable Long id, @RequestBody Request.RequestToCreateOrUpdateAuthor request) {
+    return authorService.updateAuthor(id, request.getFirstName(), request.getLastName());
   }
 
   @DeleteMapping("/{id}")

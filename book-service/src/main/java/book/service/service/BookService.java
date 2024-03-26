@@ -26,11 +26,15 @@ public class BookService {
     this.authorService = authorService;
   }
 
+  protected BookService() {
+  }
+
   @Transactional
   public BookResponse createBook(String firstName, String lastName, String title) {
     Author author = authorService.createAuthor(firstName, lastName);
     authorService.addNewBook(author.getId(), title);
-    return new BookResponse(author.getId(), title);
+    Book book = bookRepository.findByTitle(title);
+    return new BookResponse(book.getId(), author.getId(), title);
   }
 
   @Transactional

@@ -1,12 +1,10 @@
 package book.service.service;
 
 import book.service.controller.BookController;
+import book.service.controller.response.AuthorResponse;
 import book.service.entity.Author;
 import book.service.entity.Book;
 import book.service.repository.AuthorRepository;
-import book.service.repository.BookRepository;
-import book.service.repository.exception.BookNotFoundException;
-import io.swagger.v3.oas.annotations.servers.Server;
 import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,11 +37,12 @@ public class AuthorService {
   }
 
   @Transactional
-  public void updateAuthor(Long id, String firstName, String lastName) {
+  public AuthorResponse updateAuthor(Long id, String firstName, String lastName) {
     Author author = authorRepository.findById(id).orElseThrow();
     author.setFirstName(firstName);
     author.setLastName(lastName);
     authorRepository.save(author);
+    return new AuthorResponse(author.getId(), firstName, lastName);
   }
 
   @Transactional

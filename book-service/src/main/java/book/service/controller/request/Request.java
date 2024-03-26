@@ -7,22 +7,7 @@ import jakarta.validation.constraints.NotNull;
 import java.util.Set;
 
 public class Request {
-  public static class RequestToUpdateBook {
-    @NotNull(message = "Author can`t be null")
-    private String title;
-
-    public RequestToUpdateBook(String title) {
-      this.title = title;
-    }
-
-    public String getTitle() {
-      return title;
-    }
-
-    public void setTitle(String title) {
-      this.title = title;
-    }
-  }
+  public static record RequestToUpdateBook(String title) {}
 
   public static class RequestToCreateBook {
     @NotNull(message = "Author`s firstName can`t be null")

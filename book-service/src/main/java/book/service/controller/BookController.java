@@ -11,10 +11,7 @@ import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import book.service.repository.exception.BookNotFoundException;
 
 
 @RestController
@@ -35,7 +32,7 @@ public class BookController {
 
   @PutMapping("/{id}")
   public void updateBook(@PathVariable Long id, @Valid @RequestBody Request.RequestToUpdateBook request) {
-    bookService.updateBook(id, request.getTitle());
+    bookService.updateBook(id, request.title());
   }
 
   @DeleteMapping("/{id}")
@@ -43,11 +40,4 @@ public class BookController {
     bookService.deleteBook(id);
   }
 
-  @ExceptionHandler
-  public ResponseEntity<ApiError> BookNotFoundExceptionHandler(BookNotFoundException e) {
-    return new ResponseEntity<>(
-        new ApiError(e.getMessage()),
-        HttpStatus.NOT_FOUND
-    );
-  }
 }

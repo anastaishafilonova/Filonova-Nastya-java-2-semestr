@@ -66,8 +66,6 @@ public class Author {
 
   public void addBookInBookList(String title) {
     this.bookList.add(new Book(this, title));
-    logger.info("Title: " + title);
-    logger.info("Author: " + this);
   }
 
   public void deleteBookFromBookList(Long bookId) {

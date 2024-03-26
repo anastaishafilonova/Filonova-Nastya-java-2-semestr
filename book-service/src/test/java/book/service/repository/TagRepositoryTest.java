@@ -1,10 +1,18 @@
 package book.service.repository;
 
-import org.junit.jupiter.api.Tag;
+import book.service.controller.response.BookResponse;
+import book.service.controller.response.TagResponse;
+import book.service.entity.Tag;
+import book.service.service.AuthorService;
+import book.service.service.BookService;
+import book.service.service.DatabaseSuite;
+import book.service.service.TagService;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.transaction.annotation.Propagation;
@@ -13,25 +21,24 @@ import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
+import static org.junit.Assert.assertEquals;
+
 @DataJpaTest
 @Transactional(propagation = Propagation.NOT_SUPPORTED)
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @Testcontainers
-class TagRepositoryTest {
+@Import({TagService.class, BookService.class, AuthorService.class})
+class TagRepositoryTest extends DatabaseSuite {
   @Autowired
   TagRepository tagRepository;
-  @Container
-  public static final PostgreSQLContainer<?> POSTGRES = new PostgreSQLContainer<>("postgres:13");
-
-  @DynamicPropertySource
-  static void setProperties(DynamicPropertyRegistry registry) {
-    registry.add("spring.datasource.url", POSTGRES::getJdbcUrl);
-    registry.add("spring.datasource.username", POSTGRES::getUsername);
-    registry.add("spring.datasource.password", POSTGRES::getPassword);
-  }
-
+  @Autowired
+  TagService tagService;
+  @Autowired
+  BookService bookService;
   @Test
   public void findTagByNameTest() {
-    tagRepository.findTagByName("Детектив");
+    BookResponse book = bookService.createBook("Андрей", "Курпатов", "Красная таблетка");
+    Tag tag = tagService.createTag("Психология", book.id());
+    Assertions.assertEquals(tagRepository.findTagByName("Психология").getId(), tag.getId());
   }
 }

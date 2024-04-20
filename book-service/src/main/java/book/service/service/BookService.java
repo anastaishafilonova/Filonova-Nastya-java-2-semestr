@@ -49,4 +49,11 @@ public class BookService {
     Book book = bookRepository.findById(id).orElseThrow();
     authorService.deleteBook(book.getAuthor().getId(), id);
   }
+
+  @Transactional
+  public BookInfo getBookInfo(Long id) {
+    Book book = bookRepository.findById(id).orElseThrow();
+    Author author = book.getAuthor();
+    return new BookInfo(author.getFirstName(), author.getLastName(), book.getTitle());
+  }
 }

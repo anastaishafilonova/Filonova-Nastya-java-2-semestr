@@ -1,23 +1,24 @@
 package book.service.service;
 
-import book.service.controller.BookController;
+import book.service.controller.RatingResult;
 import book.service.controller.response.BookResponse;
 import book.service.entity.Author;
 import book.service.entity.Book;
 import book.service.repository.BookRepository;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
 
-@Component
+@Service
 public class BookService {
   private BookRepository bookRepository;
   private AuthorService authorService;
   private static final Logger logger = LoggerFactory.getLogger(BookService.class);
+  private final ObjectMapper objectMapper = new ObjectMapper();
 
 
   @Autowired
@@ -55,5 +56,13 @@ public class BookService {
     Book book = bookRepository.findById(id).orElseThrow();
     Author author = book.getAuthor();
     return new BookInfo(author.getFirstName(), author.getLastName(), book.getTitle());
+  }
+
+  @Transactional
+  public void process(String message) throws JsonProcessingException {
+    var result = objectMapper.readValue(message, RatingResult.class);
+    Book book = bookRepository.findById(result.bookId()).orElseThrow();
+    book.setRating(result.rating());
+    bookRepository.save(book);
   }
 }

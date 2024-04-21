@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.atomic.AtomicLong;
 
 @Service
 public class MessageProcessor {
@@ -30,11 +31,12 @@ public class MessageProcessor {
     this.topic = topic;
   }
 
-  public void process(Long bookId) throws JsonProcessingException {
+  public int process(Long bookId) throws JsonProcessingException {
     int rating = (int) (1 + Math.random() * 9);
     LOGGER.info("rating equals" + rating);
     String message = objectMapper.writeValueAsString(new RatingResult(bookId, rating));
-    CompletableFuture<SendResult<String, String>> sendResult = kafkaTemplate.send(topic, message);
+    CompletableFuture<SendResult<String, String>> sendResult = kafkaTemplate.send(topic, bookId.toString(), message);
+    return rating;
   }
 }
 record RatingResult(Long bookId, int rating) {}

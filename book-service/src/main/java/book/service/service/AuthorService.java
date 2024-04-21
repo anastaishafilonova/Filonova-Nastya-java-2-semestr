@@ -12,7 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
-@Component
+@Service
 public class AuthorService {
   private AuthorRepository authorRepository;
   private static final Logger logger = LoggerFactory.getLogger(AuthorService.class);

@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 
-@Component
+@Service
 public class BookService {
   private BookRepository bookRepository;
   private AuthorService authorService;

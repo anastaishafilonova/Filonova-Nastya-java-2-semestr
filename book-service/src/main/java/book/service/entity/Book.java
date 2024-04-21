@@ -25,6 +25,8 @@ public class Book {
   @ManyToMany(mappedBy = "books")
   private Set<Tag> tags = new HashSet<>();
 
+  private int rating;
+
   protected Book() {
   }
 
@@ -53,6 +55,13 @@ public class Book {
     return id;
   }
 
+  public int getRating() {
+    return rating;
+  }
+
+  public void setRating(int rating) {
+    this.rating = rating;
+  }
 
   @Override
   public String toString() {

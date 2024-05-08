@@ -26,6 +26,7 @@ public class Book {
   private Set<Tag> tags = new HashSet<>();
 
   private int rating;
+  private String status;  // статус оплаты
 
   protected Book() {
   }
@@ -61,6 +62,14 @@ public class Book {
 
   public void setRating(int rating) {
     this.rating = rating;
+  }
+
+  public String getStatus() {
+    return status;
+  }
+
+  public void setStatus(String status) {
+    this.status = status;
   }
 
   @Override

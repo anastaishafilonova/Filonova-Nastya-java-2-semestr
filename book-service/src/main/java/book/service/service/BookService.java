@@ -1,10 +1,12 @@
 package book.service.service;
 
+import book.service.controller.BookPurchaseResult;
 import book.service.controller.RatingResult;
 import book.service.controller.response.BookResponse;
 import book.service.entity.Author;
 import book.service.entity.Book;
 import book.service.repository.BookRepository;
+import book.service.repository.OutboxRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;
@@ -25,9 +27,6 @@ public class BookService {
   public BookService(BookRepository bookRepository, AuthorService authorService) {
     this.bookRepository = bookRepository;
     this.authorService = authorService;
-  }
-
-  protected BookService() {
   }
 
   @Transactional
@@ -63,6 +62,14 @@ public class BookService {
     var result = objectMapper.readValue(message, RatingResult.class);
     Book book = bookRepository.findById(result.bookId()).orElseThrow();
     book.setRating(result.rating());
+    bookRepository.save(book);
+  }
+
+  @Transactional
+  public void purchaseProcess(String message) throws JsonProcessingException {
+    var result = objectMapper.readValue(message, BookPurchaseResult.class);
+    Book book = bookRepository.findById(result.bookId()).orElseThrow();
+    book.setStatus(result.resultStatus());
     bookRepository.save(book);
   }
 }

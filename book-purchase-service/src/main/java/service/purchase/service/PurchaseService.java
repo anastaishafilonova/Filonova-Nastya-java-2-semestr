@@ -1,4 +1,4 @@
-package service.purchase;
+package service.purchase.service;
 
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;

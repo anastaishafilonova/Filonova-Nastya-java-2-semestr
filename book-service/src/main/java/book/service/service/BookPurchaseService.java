@@ -32,7 +32,7 @@ public class BookPurchaseService {
   public void buyBook(Long id, Long userId) throws JsonProcessingException {
     try {
       Book book = bookRepository.findById(id).orElseThrow();
-      if (!book.getStatus().equals("payment-pending")) {
+      if (!book.getStatus().equals("payment-pending") && !book.getStatus().equals("paid")) {
         book.setStatus("payment-pending");
         bookRepository.save(book);
         Outbox outbox = new Outbox(objectMapper.writeValueAsString(new BookPurchaseMessage(id, userId)));

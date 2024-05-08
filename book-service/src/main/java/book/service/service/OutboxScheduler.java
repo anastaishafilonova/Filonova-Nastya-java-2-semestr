@@ -8,12 +8,13 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.SendResult;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
-@Service
+@Component
 public class OutboxScheduler {
   private final KafkaTemplate<String, String> kafkaTemplate;
   private final String topic;
@@ -34,5 +35,10 @@ public class OutboxScheduler {
       CompletableFuture<SendResult<String, String>> sendResult = kafkaTemplate.send(topic, outboxRecord.getData());
     }
     outboxRepository.deleteAll(result);
+  }
+
+  @Transactional
+  public void saveMessage(Outbox outbox) {
+    outboxRepository.save(outbox);
   }
 }

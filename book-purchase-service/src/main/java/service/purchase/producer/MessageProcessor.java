@@ -1,4 +1,4 @@
-package service.purchase;
+package service.purchase.producer;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -40,6 +40,7 @@ public class MessageProcessor {
       Purchase purchase = purchaseRepository.findById(userId).orElseThrow();
       if (purchase.getMoney() >= 100) {
         purchase.setMoney(purchase.getMoney() - 100);
+        purchaseRepository.save(purchase);
         resultStatus = "paid";
       } else {
         resultStatus = "cancelled";

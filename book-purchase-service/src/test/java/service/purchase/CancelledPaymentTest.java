@@ -70,11 +70,11 @@ class CancelledPaymentTest extends DatabaseSuite {
 
   @Test
   public void shouldPaidSucceed() throws JsonProcessingException, InterruptedException {
-    Purchase purchase = new Purchase(50, 1L);
+    Purchase purchase = new Purchase(50, 2L);
     when(purchaseRepository.findById(1L)).thenReturn(Optional.of(purchase));
 
     CompletableFuture<SendResult<String, String>> sendResult = kafkaTemplate.send("some-test-topic2",
-        objectMapper.writeValueAsString(new BookPurchaseMessage(1L, 1L)));
+        objectMapper.writeValueAsString(new BookPurchaseMessage(2L, 2L)));
     Thread.sleep(15000);
     KafkaTestConsumer consumer = new KafkaTestConsumer(KAFKA.getBootstrapServers(), "book-service-group1mvn");
     consumer.subscribe(List.of("some-test-topic3"));
@@ -88,7 +88,7 @@ class CancelledPaymentTest extends DatabaseSuite {
           } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
           }
-          assertEquals(new BookPurchaseResult(1L, "cancelled"), message);
+          assertEquals(new BookPurchaseResult(2L, "cancelled"), message);
         }
     );
   }

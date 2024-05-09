@@ -45,8 +45,10 @@ import static org.mockito.Mockito.when;
 )
 @Import({KafkaAutoConfiguration.class, SuccessfulPaymentTest.ObjectMapperTestConfig.class})
 @Testcontainers
+@Transactional(propagation = Propagation.NOT_SUPPORTED)
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @DirtiesContext
-class SuccessfulPaymentTest {
+class SuccessfulPaymentTest extends DatabaseSuite {
   @TestConfiguration
   static class ObjectMapperTestConfig {
     @Bean

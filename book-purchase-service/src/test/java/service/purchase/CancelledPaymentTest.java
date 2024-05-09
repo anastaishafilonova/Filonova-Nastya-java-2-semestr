@@ -7,6 +7,7 @@ import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.kafka.KafkaAutoConfiguration;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -16,11 +17,14 @@ import org.springframework.context.annotation.Import;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.SendResult;
 import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import org.testcontainers.containers.KafkaContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 import service.purchase.consumer.BookPurchaseMessage;
+import service.purchase.controller.DatabaseSuite;
 import service.purchase.entity.Purchase;
 import service.purchase.producer.BookPurchaseResult;
 import service.purchase.repository.PurchaseRepository;
@@ -39,9 +43,11 @@ import static org.mockito.Mockito.when;
     }
 )
 @Import({KafkaAutoConfiguration.class, CancelledPaymentTest.ObjectMapperTestConfig.class})
+@Transactional(propagation = Propagation.NOT_SUPPORTED)
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @Testcontainers
 @DirtiesContext
-class CancelledPaymentTest {
+class CancelledPaymentTest extends DatabaseSuite {
   @TestConfiguration
   static class ObjectMapperTestConfig {
     @Bean

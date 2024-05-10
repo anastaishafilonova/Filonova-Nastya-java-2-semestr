@@ -2,16 +2,17 @@ package book.service.controller;
 
 import book.service.controller.request.Request;
 import book.service.controller.response.BookResponse;
-import book.service.service.BookPurchaseService;
 import book.service.service.BookService;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
+
+import static org.springframework.security.authorization.AuthorityReactiveAuthorizationManager.hasAuthority;
 
 
 @RestController
@@ -27,6 +28,12 @@ public class BookController {
     this.authorRegistryGateway = authorRegistryGateway;
   }
 
+  @GetMapping("/welcome")
+  public String welcome() {
+    return "Welcome";
+  }
+
+  @PreAuthorize("hasAuthority('ADMIN')")
   @PostMapping("")
   public BookResponse createBook(@Valid @RequestBody Request.RequestToCreateBook request) {
     String requestId = UUID.randomUUID().toString();
@@ -34,11 +41,13 @@ public class BookController {
     return (bookService.createBook(request.getFirstName(), request.getLastName(), request.getTitle()));
   }
 
+  @PreAuthorize("hasAuthority('ADMIN')")
   @PutMapping("/{id}")
   public void updateBook(@PathVariable Long id, @Valid @RequestBody Request.RequestToUpdateBook request) {
     bookService.updateBook(id, request.title());
   }
 
+  @PreAuthorize("hasAuthority('ADMIN')")
   @DeleteMapping("/{id}")
   public void deleteBook(@PathVariable Long id) {
     String requestId = UUID.randomUUID().toString();

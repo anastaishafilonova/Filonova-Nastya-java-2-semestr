@@ -4,6 +4,7 @@ import book.service.entity.Author;
 import book.service.entity.Book;
 import book.service.repository.AuthorRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,6 +21,7 @@ public class AuthorViewController {
     this.authorRepository = authorRepository;
   }
 
+  @PreAuthorize("isAuthenticated()")
   @GetMapping("/authors")
   public String viewAuthors(Model model) {
     List<Author> authors = authorRepository.findAllBy();

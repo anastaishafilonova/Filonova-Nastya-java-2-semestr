@@ -3,6 +3,7 @@ package book.service.entity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import org.hibernate.annotations.JoinColumnOrFormula;
+import org.springframework.boot.context.properties.bind.DefaultValue;
 
 import java.util.HashSet;
 import java.util.List;
@@ -27,12 +28,16 @@ public class Book {
 
   private int rating;
 
+  @NotNull
+  private String status;  // статус оплаты
+
   protected Book() {
   }
 
   public Book(Author author, String title) {
     this.author = author;
     this.title = title;
+    this.status = "no-status";
   }
 
   public Author getAuthor() {
@@ -61,6 +66,14 @@ public class Book {
 
   public void setRating(int rating) {
     this.rating = rating;
+  }
+
+  public String getStatus() {
+    return status;
+  }
+
+  public void setStatus(String status) {
+    this.status = status;
   }
 
   @Override

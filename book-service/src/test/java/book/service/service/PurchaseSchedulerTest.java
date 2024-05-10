@@ -1,5 +1,8 @@
 package book.service.service;
 
+import book.service.entity.BookPurchaseMessage;
+import book.service.entity.Outbox;
+import book.service.repository.OutboxRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
@@ -9,11 +12,17 @@ import org.apache.kafka.common.serialization.StringDeserializer;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.kafka.KafkaAutoConfiguration;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import org.testcontainers.containers.KafkaContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
@@ -26,13 +35,14 @@ import java.util.Properties;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@SpringBootTest(
-    classes = {RatingService.class},
-    properties = {"topic-to-send-message=some-test-topic"}
+@DataJpaTest(
+    properties = {"topic1-to-send-message=some-test-topic"}
 )
-@Import({KafkaAutoConfiguration.class, RatingServiceTest.ObjectMapperTestConfig.class})
+@Import({KafkaAutoConfiguration.class, PurchaseSchedulerTest.ObjectMapperTestConfig.class, OutboxScheduler.class})
+@Transactional(propagation = Propagation.NOT_SUPPORTED)
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @Testcontainers
-class RatingServiceTest {
+class PurchaseSchedulerTest extends DatabaseSuite{
   @TestConfiguration
   static class ObjectMapperTestConfig {
     @Bean
@@ -46,14 +56,14 @@ class RatingServiceTest {
   public static final KafkaContainer KAFKA = new KafkaContainer(DockerImageName.parse("confluentinc/cp-kafka:7.4.0"));
 
   @Autowired
-  private RatingService ratingService;
+  private OutboxScheduler outboxScheduler;
   @Autowired
   private ObjectMapper objectMapper;
 
   @Test
-  void shouldSendMessageToKafkaSuccessfully() {
-
-    assertDoesNotThrow(() -> ratingService.rating(67L));
+  void shouldSendMessageToKafkaSuccessfully() throws JsonProcessingException {
+    assertDoesNotThrow(() -> outboxScheduler.saveMessage(new Outbox(objectMapper.writeValueAsString(new BookPurchaseMessage(1L, 5L)))));
+    assertDoesNotThrow(() -> outboxScheduler.processOutbox());
 
     KafkaTestConsumer consumer = new KafkaTestConsumer(KAFKA.getBootstrapServers(), "some-group-id");
     consumer.subscribe(List.of("some-test-topic"));
@@ -62,40 +72,14 @@ class RatingServiceTest {
     assertEquals(1, records.count());
     records.iterator().forEachRemaining(
         record -> {
-          RatingBookMessage message = null;
+          BookPurchaseMessage message = null;
           try {
-            message = objectMapper.readValue(record.value(), RatingBookMessage.class);
+            message = objectMapper.readValue(record.value(), BookPurchaseMessage.class);
           } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
           }
-          assertEquals(new RatingBookMessage(67L), message);
+          assertEquals(new BookPurchaseMessage(1L, 5L), message);
         }
     );
   }
-}
-
-class KafkaTestConsumer {
-
-  private final KafkaConsumer<String, String> consumer;
-
-  public KafkaTestConsumer(String bootstrapServers, String groupId) {
-    Properties props = new Properties();
-
-    props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
-    props.put(ConsumerConfig.GROUP_ID_CONFIG, groupId);
-    props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
-    props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
-    props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
-
-    this.consumer = new KafkaConsumer<>(props);
-  }
-
-  public void subscribe(List<String> topics) {
-    consumer.subscribe(topics);
-  }
-
-  public ConsumerRecords<String, String> poll() {
-    return consumer.poll(Duration.ofSeconds(5));
-  }
-
 }
